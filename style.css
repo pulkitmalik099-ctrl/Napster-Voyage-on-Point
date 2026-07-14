@@ -77,34 +77,15 @@ a {
    Header & Announcement Banner
    ========================================================================== */
 
-.announcement-banner {
-  background: linear-gradient(90deg, #f1f5f9, #e2e8f0, #f1f5f9);
-  color: var(--text-primary);
-  font-size: 0.75rem;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  text-align: center;
-  position: relative;
-  z-index: 50;
-  border-bottom: 1px solid var(--border-light);
-}
 
-.announcement-banner a {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
-  padding: 0.75rem 1rem;
-}
 
-.announcement-banner a:hover {
-  background-color: rgba(15, 23, 42, 0.03);
-}
+
+
+
 
 .header {
   position: absolute;
-  top: 3.5rem;
+  top: 0;
   left: 0;
   width: 100%;
   z-index: 40;
@@ -809,152 +790,7 @@ a {
   color: #dc2626;
 }
 
-/* Interactive Sticky Bar (Desktop Only) */
-.fixed-summary-bar {
-  position: fixed;
-  top: 1.5rem;
-  left: 0;
-  width: 100%;
-  display: flex;
-  justify-content: center;
-  z-index: 45;
-  opacity: 0;
-  pointer-events: none;
-  transform: translateY(-20px);
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-}
 
-.fixed-summary-bar.show {
-  opacity: 1;
-  pointer-events: auto;
-  transform: translateY(0);
-}
-
-.summary-bar-container {
-  background-color: rgba(255, 255, 255, 0.85);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1px solid var(--glass-border);
-  box-shadow: var(--shadow-lg);
-  border-radius: var(--radius-full);
-  padding: 0.75rem 1.75rem;
-  display: flex;
-  align-items: center;
-  gap: 1.25rem;
-  cursor: pointer;
-}
-
-.summary-bar-text {
-  font-size: 0.875rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-}
-
-.summary-program-node {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-
-.summary-node-logo {
-  width: 1.5rem;
-  height: 1.5rem;
-  border-radius: 4px;
-  object-fit: contain;
-}
-
-.summary-node-name {
-  font-size: 0.875rem;
-  font-weight: 600;
-}
-
-.summary-arrow {
-  width: 1rem;
-  height: 1rem;
-  color: var(--text-muted);
-}
-
-.summary-points-val {
-  font-size: 0.875rem;
-  font-weight: 700;
-  background-color: var(--text-primary);
-  color: var(--bg-primary);
-  padding: 0.25rem 0.75rem;
-  border-radius: var(--radius-full);
-}
-
-/* ==========================================================================
-   Results Grid & Cards
-   ========================================================================== */
-
-.results-header-controls {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  border-bottom: 1px solid var(--border-light);
-  padding-bottom: 1rem;
-  margin-top: 3rem;
-  margin-bottom: 1.5rem;
-}
-
-.results-count {
-  font-size: 0.875rem;
-  font-weight: 500;
-  color: var(--text-secondary);
-}
-
-.results-filters {
-  display: flex;
-  gap: 1rem;
-  align-items: center;
-}
-
-.filter-group {
-  display: flex;
-  background-color: rgba(15, 23, 42, 0.04);
-  padding: 0.25rem;
-  border-radius: var(--radius-full);
-}
-
-.filter-tab-btn {
-  background: none;
-  border: none;
-  font-size: 0.75rem;
-  font-weight: 600;
-  color: var(--text-secondary);
-  padding: 0.375rem 1rem;
-  border-radius: var(--radius-full);
-  cursor: pointer;
-  transition: all 0.15s;
-}
-
-.filter-tab-btn.active {
-  background-color: var(--bg-primary);
-  color: var(--text-primary);
-  box-shadow: var(--shadow-sm);
-}
-
-.sort-select {
-  border: 1px solid var(--border-light);
-  background-color: var(--bg-primary);
-  font-size: 0.75rem;
-  font-weight: 600;
-  color: var(--text-secondary);
-  padding: 0.375rem 1.75rem 0.375rem 0.75rem;
-  border-radius: var(--radius-full);
-  outline: none;
-  cursor: pointer;
-  appearance: none;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2364748b'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'/%3E%3C/svg%3E");
-  background-repeat: no-repeat;
-  background-position: right 0.5rem center;
-  background-size: 0.875rem;
-}
-
-.sort-select:hover {
-  border-color: var(--text-primary);
-}
 
 /* Results Grid Layout */
 .results-grid {

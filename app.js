@@ -3,6 +3,14 @@
    ========================================================================== */
 
 // State Management
+function getLogoUrl(url) {
+    if (!url) return 'logos/li.png';
+    if (url.startsWith('logos/')) return url;
+    if (url.startsWith('http')) return url;
+    let filename = url.substring(url.lastIndexOf('/') + 1);
+    return 'logos/' + filename;
+}
+
 let selectedFromId = null;
 let selectedToId = null;
 let transferValue = 10000;
@@ -17,7 +25,7 @@ let fromList, toList;
 let pointsInput, pointsSlider;
 let resultsGrid, resultsCountLabel;
 let bonusDropdownBtn, bonusDropdownPanel, bonusOffersList;
-let fixedSummaryBar;
+
 
 document.addEventListener('DOMContentLoaded', () => {
     // Initialize DOM Elements
@@ -36,7 +44,7 @@ document.addEventListener('DOMContentLoaded', () => {
     bonusDropdownBtn = document.getElementById('bonus-dropdown-btn');
     bonusDropdownPanel = document.getElementById('bonus-dropdown-panel');
     bonusOffersList = document.getElementById('bonus-offers-list');
-    fixedSummaryBar = document.getElementById('fixed-summary-bar');
+    
 
     // Parse and register active bonus offers
     extractBonusOffers();
@@ -45,7 +53,7 @@ document.addEventListener('DOMContentLoaded', () => {
     populateDropdownLists();
 
     // Attach scroll listener for sticky summary bar
-    window.addEventListener('scroll', handleScrollSummaryBar);
+    
 
     // Initial render
     refreshCalculator();
@@ -105,8 +113,8 @@ function extractBonusOffers() {
             };
 
             // Safeguard logo urls
-            const sLogo = offer.sourceLogo.startsWith('http') ? offer.sourceLogo : `https://points.casa${offer.sourceLogo}`;
-            const pLogo = offer.partnerLogo.startsWith('http') ? offer.partnerLogo : `https://points.casa${offer.partnerLogo}`;
+            const sLogo = getLogoUrl(offer.sourceLogo);
+            const pLogo = getLogoUrl(offer.partnerLogo);
 
             btn.innerHTML = `
                 <div class="bonus-offer-logo-container">
@@ -142,7 +150,7 @@ function populateDropdownLists() {
     });
 
     allPrograms.forEach(program => {
-        const logoUrl = program.logo_url.startsWith('http') ? program.logo_url : `https://points.casa${program.logo_url}`;
+        const logoUrl = getLogoUrl(program.logo_url);
         
         const option = document.createElement('button');
         option.className = 'dropdown-option-item';
@@ -152,7 +160,7 @@ function populateDropdownLists() {
         option.onclick = () => selectOption('from', program.id);
         
         option.innerHTML = `
-            <img class="dropdown-option-logo" src="${logoUrl}" alt="${program.name}" onerror="this.src='https://assets.points.casa/misc/li.png'">
+            <img class="dropdown-option-logo" src="${logoUrl}" alt="${program.name}" onerror="this.src='logos/li.png'">
             <span class="dropdown-option-name">${program.name}</span>
         `;
         fromList.appendChild(option);
@@ -170,7 +178,7 @@ function populateDropdownLists() {
     const destinationsList = Object.values(uniqueDestinations).sort((a, b) => a.name.localeCompare(b.name));
 
     destinationsList.forEach(partner => {
-        const logoUrl = partner.logo_url.startsWith('http') ? partner.logo_url : `https://points.casa${partner.logo_url}`;
+        const logoUrl = getLogoUrl(partner.logo_url);
 
         const option = document.createElement('button');
         option.className = 'dropdown-option-item';
@@ -180,7 +188,7 @@ function populateDropdownLists() {
         option.onclick = () => selectOption('to', partner.id);
 
         option.innerHTML = `
-            <img class="dropdown-option-logo" src="${logoUrl}" alt="${partner.name}" onerror="this.src='https://assets.points.casa/misc/li.png'">
+            <img class="dropdown-option-logo" src="${logoUrl}" alt="${partner.name}" onerror="this.src='logos/li.png'">
             <span class="dropdown-option-name">${partner.name}</span>
         `;
         toList.appendChild(option);
@@ -247,7 +255,7 @@ function selectOption(type, id) {
     const program = getProgramById(id) || findPartnerById(id);
     if (!program) return;
 
-    const logoUrl = program.logo_url.startsWith('http') ? program.logo_url : `https://points.casa${program.logo_url}`;
+    const logoUrl = getLogoUrl(program.logo_url);
 
     if (type === 'from') {
         selectedFromId = id;
@@ -370,47 +378,8 @@ function scrollToCalculator() {
     }
 }
 
-/* ==========================================================================
-   Sticky Summary Bar Logic
-   ========================================================================== */
 
-function handleScrollSummaryBar() {
-    const calcSection = document.getElementById('calculator-section');
-    if (!calcSection) return;
 
-    const calcBounds = calcSection.getBoundingClientRect();
-    
-    // If calculator starts scrolling off the screen, show summary bar
-    if (calcBounds.top < 0 && window.scrollY > 400) {
-        fixedSummaryBar.classList.add('show');
-        
-        // Update summary bar data
-        const fromProgram = getProgramById(selectedFromId);
-        const toProgram = selectedToId ? (getProgramById(selectedToId) || findPartnerById(selectedToId)) : null;
-
-        if (fromProgram) {
-            const logoUrl = fromProgram.logo_url.startsWith('http') ? fromProgram.logo_url : `https://points.casa${fromProgram.logo_url}`;
-            document.getElementById('summary-from-logo').src = logoUrl;
-            document.getElementById('summary-from-logo').style.display = 'inline-block';
-            document.getElementById('summary-from-name').innerText = fromProgram.short_name || fromProgram.name;
-        } else {
-            document.getElementById('summary-from-logo').style.display = 'none';
-            document.getElementById('summary-from-name').innerText = 'Any program...';
-        }
-
-        if (toProgram) {
-            const logoUrl = toProgram.logo_url.startsWith('http') ? toProgram.logo_url : `https://points.casa${toProgram.logo_url}`;
-            document.getElementById('summary-to-logo').src = logoUrl;
-            document.getElementById('summary-to-logo').style.display = 'inline-block';
-            document.getElementById('summary-to-name').innerText = toProgram.short_name || toProgram.name;
-        } else {
-            document.getElementById('summary-to-logo').style.display = 'none';
-            document.getElementById('summary-to-name').innerText = 'Any partner';
-        }
-    } else {
-        fixedSummaryBar.classList.remove('show');
-    }
-}
 
 /* ==========================================================================
    Calculations & Rendering Engine
@@ -585,8 +554,8 @@ function refreshCalculator() {
 
     // Render Card Grid
     itemsToDisplay.forEach((item, index) => {
-        const sLogo = item.sourceLogo.startsWith('http') ? item.sourceLogo : `https://points.casa${item.sourceLogo}`;
-        const pLogo = item.partnerLogo.startsWith('http') ? item.partnerLogo : `https://points.casa${item.partnerLogo}`;
+        const sLogo = getLogoUrl(item.sourceLogo);
+        const pLogo = getLogoUrl(item.partnerLogo);
 
         const card = document.createElement('div');
         card.className = 'partner-result-card';
@@ -666,7 +635,7 @@ function openProgramDetail(id) {
     const overlay = document.getElementById('detail-modal');
     const modalBody = document.getElementById('modal-body-content');
 
-    const logoUrl = program.logo_url.startsWith('http') ? program.logo_url : `https://points.casa${program.logo_url}`;
+    const logoUrl = getLogoUrl(program.logo_url);
 
     // Populate modal body
     let modalHTML = `
@@ -693,7 +662,7 @@ function openProgramDetail(id) {
                 <span class="modal-list-header">Transfer Partners (${program.partners.length})</span>
         `;
         program.partners.forEach(partner => {
-            const pLogo = partner.logo_url.startsWith('http') ? partner.logo_url : `https://points.casa${partner.logo_url}`;
+            const pLogo = getLogoUrl(partner.logo_url);
             modalHTML += `
                 <div class="modal-transfer-row" onclick="quickSelectRoute(${program.id}, ${partner.id}); closeDetailModal();">
                     <div style="display: flex; align-items: center; gap: 0.75rem; cursor: pointer;">
@@ -729,7 +698,7 @@ function openProgramDetail(id) {
                 <span class="modal-list-header">Can receive transfers from (${sources.length})</span>
         `;
         sources.forEach(src => {
-            const sLogo = src.logo.startsWith('http') ? src.logo : `https://points.casa${src.logo}`;
+            const sLogo = getLogoUrl(src.logo);
             modalHTML += `
                 <div class="modal-transfer-row" onclick="quickSelectRoute(${src.id}, ${program.id}); closeDetailModal();">
                     <div style="display: flex; align-items: center; gap: 0.75rem; cursor: pointer;">
