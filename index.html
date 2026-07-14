@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="en" style="scroll-behavior: smooth;">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    
+    <title>Napster-Voyage on Point - Optimal Use of Your Reward Points</title>
+    <meta name="description" content="Track, optimize, and calculate credit card points and airline miles conversions in India from one place.">
+    
+    <!-- Design styling -->
+    <link rel="stylesheet" href="style.css">
+    
+    <!-- Twemoji for cross-platform emoji support (flag emojis render correctly on Windows) -->
+    <script src="https://cdn.jsdelivr.net/npm/twemoji@14.0.2/dist/twemoji.min.js" defer crossorigin="anonymous"></script>
+</head>
+<body class="font-inter sky-theme">
+
+    <!-- Announcement Banner -->
+    <div class="announcement-banner">
+        <a href="#calculator-section">
+            <span>🎉 Try out our latest tool - the points transfer calculator</span>
+        </a>
+    </div>
+
+    <!-- Navigation Header -->
+    <header class="header">
+        <div class="header-container">
+            <div class="logo">
+                <a href="#">
+                    <span class="logo-emoji">🪂</span> Napster-Voyage on Point
+                </a>
+            </div>
+            <div class="nav-links">
+                <a href="#guides-section" class="nav-btn text-btn">Guides</a>
+                <a href="#calculator-section" class="nav-btn outline-btn">Calculator</a>
+                <a href="https://cal.com/team/pointscasa" target="_blank" rel="noopener noreferrer" class="nav-btn primary-btn">Consultation</a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Floating Interactive Summary Bar -->
+    <div id="fixed-summary-bar" class="fixed-summary-bar" onclick="scrollToCalculator()">
+        <div class="summary-bar-container">
+            <span class="summary-bar-text">Transfer</span>
+            <div class="summary-program-node">
+                <img id="summary-from-logo" class="summary-node-logo" src="" alt="" style="display: none;">
+                <span id="summary-from-name" class="summary-node-name">Any program...</span>
+            </div>
+            <svg class="summary-arrow" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path>
+            </svg>
+            <div class="summary-program-node">
+                <img id="summary-to-logo" class="summary-node-logo" src="" alt="" style="display: none;">
+                <span id="summary-to-name" class="summary-node-name">Any partner</span>
+            </div>
+            <div class="summary-points-val" id="summary-points-badge">10,000 pts</div>
+        </div>
+    </div>
+
+    <!-- Hero / Landing Section -->
+    <section class="hero-section">
+        <div class="hero-content">
+            <!-- Founders badge -->
+            <div class="founders-badge">
+                <div class="founders-avatars">
+                    <div class="avatar-circle">
+                        <img src="https://points.casa/static/img/founders/ayan.08b120e0c112.webp" alt="Ayan">
+                    </div>
+                    <div class="avatar-circle">
+                        <img src="https://points.casa/static/img/founders/kanishk.3ffefe178f4d.webp" alt="Kanishk">
+                    </div>
+                </div>
+                <span>with ❤️ by Ayan, Kanishk & Napster</span>
+            </div>
+
+            <!-- Title -->
+            <h1 class="hero-title">
+                points travel in <img src="https://points.casa/static/img/elements/icons/flag-in.2e2f21a05acf.png" alt="India" class="flag-icon"> is
+                <span class="bold-span">broken</span>
+            </h1>
+
+            <!-- Description -->
+            <p class="hero-desc">
+                You have HDFC points in one app, Axis points in another, and Air India miles somewhere else. When you want to book a trip, you are opening five different apps, doing math on napkins, and figuring out conversion ratios... Most people just give up and pay with cash.
+            </p>
+
+            <p class="hero-desc" style="font-weight: 500;">
+                Napster-Voyage on Point solves this by showing you the optimal way to use your points for any trip.
+            </p>
+
+            <!-- Action buttons -->
+            <div class="hero-ctas">
+                <a href="#calculator-section" class="hero-cta-btn primary">
+                    Get Started
+                </a>
+                <a href="#guides-section" class="hero-cta-btn secondary">
+                    Browse Guides
+                </a>
+            </div>
+            <span class="hero-cta-tag">free to use, no account or credit card required</span>
+
+            <!-- Demo video container -->
+            <div class="video-wrapper">
+                <video autoplay loop muted playsinline poster="https://assets.points.casa/pc-th.webp">
+                    <source src="https://assets.points.casa/pc.mp4" type="video/mp4">
+                    Your browser does not support HTML5 video playback.
+                </video>
+            </div>
+
+            <!-- Social Links -->
+            <div class="social-links">
+                <a href="https://x.com/pointscasa" target="_blank" class="social-icon-link" title="X (Twitter)">
+                    <svg viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+                    </svg>
+                </a>
+                <a href="https://linkedin.com/company/pointscasa" target="_blank" class="social-icon-link" title="LinkedIn">
+                    <svg viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
+                    </svg>
+                </a>
+                <a href="https://instagram.com/pointscasa" target="_blank" class="social-icon-link" title="Instagram">
+                    <svg viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204 0.013-3.583 0.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259 0.014 3.668 0.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
+                    </svg>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Calculator Section -->
+    <section id="calculator-section" class="calculator-section">
+        <div class="calculator-container">
+            <!-- Header -->
+            <div class="section-header">
+                <h2 class="section-title">Transfer Calculator</h2>
+                <p class="section-subtitle">Find the exact conversion values and bonus points across partner programs</p>
+            </div>
+
+            <!-- Bonus Promos Bar -->
+            <div class="bonus-offers-bar">
+                <div class="bonus-dropdown-wrapper">
+                    <button id="bonus-dropdown-btn" class="bonus-trigger-btn" onclick="toggleBonusDropdown()">
+                        <span>⚡</span>
+                        <span id="bonus-count-badge">0 Bonus Offers</span>
+                        <svg class="bonus-trigger-chevron" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                        </svg>
+                    </button>
+                    <!-- Dropdown List -->
+                    <div id="bonus-dropdown-panel" class="bonus-panel">
+                        <div class="bonus-panel-header">
+                            <span>⚡ Active Bonus Offers</span>
+                            <p>Select to auto-fill</p>
+                        </div>
+                        <div id="bonus-offers-list" class="bonus-panel-content">
+                            <!-- Populated dynamically -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Input Form Controls -->
+            <div class="calculator-inputs">
+                <!-- Dropdown From -->
+                <div class="input-group">
+                    <span class="input-label">Transfer From</span>
+                    <div class="points-input-wrapper" style="display: flex; gap: 0.5rem;">
+                        <button id="from-program-btn" class="dropdown-trigger-btn" onclick="toggleDropdown('from')">
+                            <span id="selected-from-display" class="selected-display">
+                                <span class="selected-placeholder">📋 Select card or program...</span>
+                            </span>
+                            <svg class="chevron-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                            </svg>
+                        </button>
+                        <button id="clear-from-btn" class="clear-selection-btn" onclick="clearFromSelection()" style="display: none;" title="Clear program selection">
+                            <svg style="width: 1.25rem; height: 1.25rem;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                            </svg>
+                        </button>
+                    </div>
+                    <!-- Custom Dropdown container -->
+                    <div id="from-program-dropdown" class="dropdown-options-box">
+                        <div class="dropdown-search-container">
+                            <input type="text" id="from-search-input" class="dropdown-search-input" placeholder="Search credit cards, banks..." oninput="filterDropdown('from')">
+                        </div>
+                        <div id="from-options-list" class="dropdown-options-list">
+                            <!-- Populated dynamically -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Dropdown To -->
+                <div class="input-group">
+                    <span class="input-label">Transfer To</span>
+                    <div class="points-input-wrapper" style="display: flex; gap: 0.5rem;">
+                        <button id="to-program-btn" class="dropdown-trigger-btn" onclick="toggleDropdown('to')">
+                            <span id="selected-to-display" class="selected-display">
+                                <span class="selected-placeholder">✈️ Select airline or hotel...</span>
+                            </span>
+                            <svg class="chevron-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                            </svg>
+                        </button>
+                        <button id="clear-to-btn" class="clear-selection-btn" onclick="clearToSelection()" style="display: none;" title="Clear destination selection">
+                            <svg style="width: 1.25rem; height: 1.25rem;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                            </svg>
+                        </button>
+                    </div>
+                    <!-- Custom Dropdown container -->
+                    <div id="to-program-dropdown" class="dropdown-options-box">
+                        <div class="dropdown-search-container">
+                            <input type="text" id="to-search-input" class="dropdown-search-input" placeholder="Search airlines, hotels..." oninput="filterDropdown('to')">
+                        </div>
+                        <div id="to-options-list" class="dropdown-options-list">
+                            <!-- Populated dynamically -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Numeric Points Input -->
+                <div class="input-group">
+                    <span class="input-label">Points to Transfer</span>
+                    <div class="points-input-wrapper">
+                        <input type="number" id="points-input-val" class="points-numeric-input" value="10000" min="100" step="100" oninput="updatePointsVal(this.value)">
+                    </div>
+                    <input type="range" id="points-slider" class="slider-control" min="1000" max="100000" step="1000" value="10000" oninput="updatePointsVal(this.value)">
+                    <div class="presets-container">
+                        <button class="preset-pill-btn" onclick="adjustPoints(5000)">+5K</button>
+                        <button class="preset-pill-btn" onclick="adjustPoints(10000)">+10K</button>
+                        <button class="preset-pill-btn" onclick="adjustPoints(50000)">+50K</button>
+                        <button class="preset-pill-btn" onclick="setPoints(100000)">100K</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sorting & Filters Bar -->
+            <div class="results-header-controls">
+                <span class="results-count" id="results-count-label">Showing results</span>
+                <div class="results-filters">
+                    <!-- Categories -->
+                    <div class="filter-group">
+                        <button id="filter-all-btn" class="filter-tab-btn active" onclick="setCategoryFilter('ALL')">All</button>
+                        <button id="filter-airline-btn" class="filter-tab-btn" onclick="setCategoryFilter('AIRLINE')">Airlines</button>
+                        <button id="filter-hotel-btn" class="filter-tab-btn" onclick="setCategoryFilter('HOTEL')">Hotels</button>
+                    </div>
+                    <!-- Sorting -->
+                    <select id="results-sort" class="sort-select" onchange="setSortOrder(this.value)">
+                        <option value="VALUE_DESC">Highest Value (Optimal)</option>
+                        <option value="RATIO_ASC">Best Transfer Ratio</option>
+                        <option value="NAME_ASC">Name (A-Z)</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Results Grid -->
+            <div id="results-grid" class="results-grid">
+                <!-- Populated dynamically by app.js -->
+            </div>
+        </div>
+    </section>
+
+    <!-- Guides Directory Section -->
+    <section id="guides-section" class="guides-section">
+        <div class="guides-container">
+            <div class="guides-directory-card">
+                <div class="section-header" style="text-align: left; margin-bottom: 2rem;">
+                    <span style="font-size: 0.75rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em;">Transfer Directory</span>
+                    <h2 class="section-title" style="font-size: 2.5rem; background: none; -webkit-text-fill-color: initial; color: var(--text-primary);">Explore The Main Routes</h2>
+                    <p class="section-subtitle" style="font-size: 0.875rem;">Select card guides, popular destinations, or direct routes below.</p>
+                </div>
+
+                <div class="guides-grid">
+                    <!-- Column 1: Card Guides -->
+                    <div>
+                        <h3 class="guide-column-title">Card Programs</h3>
+                        <p class="guide-column-desc">Common loyalty reward cards in India.</p>
+                        <ul class="guide-links-list">
+                            <li class="guide-link-item">
+                                <a href="javascript:void(0)" onclick="openProgramDetail(154)">
+                                    <span class="guide-link-name">Amex Centurion</span>
+                                    <span class="guide-link-sub">American Express</span>
+                                </a>
+                            </li>
+                            <li class="guide-link-item">
+                                <a href="javascript:void(0)" onclick="openProgramDetail(52)">
+                                    <span class="guide-link-name">Amex Platinum</span>
+                                    <span class="guide-link-sub">American Express</span>
+                                </a>
+                            </li>
+                            <li class="guide-link-item">
+                                <a href="javascript:void(0)" onclick="openProgramDetail(8)">
+                                    <span class="guide-link-name">Axis Atlas</span>
+                                    <span class="guide-link-sub">Axis Bank</span>
+                                </a>
+                            </li>
+                            <li class="guide-link-item">
+                                <a href="javascript:void(0)" onclick="openProgramDetail(18)">
+                                    <span class="guide-link-name">HDFC Infinia</span>
+                                    <span class="guide-link-sub">HDFC Bank</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- Column 2: Destinations -->
+                    <div>
+                        <h3 class="guide-column-title">Destinations</h3>
+                        <p class="guide-column-desc">Popular flyer clubs and hotel rewards.</p>
+                        <ul class="guide-links-list">
+                            <li class="guide-link-item">
+                                <a href="javascript:void(0)" onclick="openProgramDetail(60)">
+                                    <span class="guide-link-name">All Accor</span>
+                                    <span class="guide-link-sub">Hotel Partners</span>
+                                </a>
+                            </li>
+                            <li class="guide-link-item">
+                                <a href="javascript:void(0)" onclick="openProgramDetail(67)">
+                                    <span class="guide-link-name">Marriott Bonvoy</span>
+                                    <span class="guide-link-sub">Hotel Partners</span>
+                                </a>
+                            </li>
+                            <li class="guide-link-item">
+                                <a href="javascript:void(0)" onclick="openProgramDetail(82)">
+                                    <span class="guide-link-name">Singapore KrisFlyer</span>
+                                    <span class="guide-link-sub">Airline Partners</span>
+                                </a>
+                            </li>
+                            <li class="guide-link-item">
+                                <a href="javascript:void(0)" onclick="openProgramDetail(48)">
+                                    <span class="guide-link-name">Qatar Privilege Club</span>
+                                    <span class="guide-link-sub">Airline Partners</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- Column 3: Common Direct Routes -->
+                    <div>
+                        <h3 class="guide-column-title">Common Routes</h3>
+                        <p class="guide-column-desc">Highly utilized conversions.</p>
+                        <ul class="guide-links-list">
+                            <li class="guide-link-item">
+                                <a href="javascript:void(0)" onclick="quickSelectRoute(18, 82)">
+                                    <span class="guide-link-name">HDFC Infinia to KrisFlyer</span>
+                                    <span class="guide-link-sub">1:1 ratio • Instant</span>
+                                </a>
+                            </li>
+                            <li class="guide-link-item">
+                                <a href="javascript:void(0)" onclick="quickSelectRoute(18, 67)">
+                                    <span class="guide-link-name">HDFC Infinia to Marriott</span>
+                                    <span class="guide-link-sub">1:1 ratio • Instant</span>
+                                </a>
+                            </li>
+                            <li class="guide-link-item">
+                                <a href="javascript:void(0)" onclick="quickSelectRoute(8, 60)">
+                                    <span class="guide-link-name">Axis Atlas to Accor</span>
+                                    <span class="guide-link-sub">2:1 ratio • 0 to 4 hours</span>
+                                </a>
+                            </li>
+                            <li class="guide-link-item">
+                                <a href="javascript:void(0)" onclick="quickSelectRoute(50, 47)">
+                                    <span class="guide-link-name">Amex Gold to BA Avios</span>
+                                    <span class="guide-link-sub">2:1 ratio • 0 to 4 hours</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- Column 4: Contact & Consult -->
+                    <div>
+                        <h3 class="guide-column-title">Need Expert Advice?</h3>
+                        <p class="guide-column-desc">Book a personal consultation to optimize your credit card spends.</p>
+                        <a href="https://cal.com/team/pointscasa" target="_blank" rel="noopener noreferrer" class="nav-btn primary-btn" style="display: block; text-align: center; margin-top: 1rem;">
+                            Book 1:1 Consultation
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Detail View Modal popup overlay -->
+    <div id="detail-modal" class="modal-overlay" onclick="closeDetailModal(event)">
+        <div class="modal-window">
+            <div class="modal-header">
+                <span class="modal-title">Program Details</span>
+                <button class="modal-close-btn" onclick="closeDetailModal(null)">
+                    <svg style="width: 1.25rem; height: 1.25rem;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </button>
+            </div>
+            <div class="modal-body" id="modal-body-content">
+                <!-- Dynamically populated -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Mobile Bottom Sticky Bar (Bonus reminder) -->
+    <div class="mobile-bottom-bar">
+        <button class="mobile-bottom-bar-btn" onclick="scrollToCalculator(); toggleBonusDropdown(true);">
+            <span style="position: relative; display: flex; width: 0.5rem; height: 0.5rem;">
+                <span style="position: absolute; display: inline-flex; border-radius: 50%; background-color: #34d399; width: 100%; height: 100%; opacity: 0.75; animation: ping 1s cubic-bezier(0, 0, 0.2, 1) infinite;"></span>
+                <span style="position: relative; display: inline-flex; border-radius: 50%; background-color: #10b981; width: 0.5rem; height: 0.5rem;"></span>
+            </span>
+            <span id="mobile-bonus-badge-text">0 Active Promo Offers</span>
+        </button>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-container">
+            <div>
+                &copy; 2026 Napster-Voyage on Point. All rights reserved.
+            </div>
+            <div class="footer-links">
+                <a href="#">Privacy Policy</a>
+                <a href="#">Terms of Service</a>
+                <a href="https://docs.points.casa/introduction" target="_blank">Docs</a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- JS Scripts loading order: database config first, then logic -->
+    <script src="data.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
