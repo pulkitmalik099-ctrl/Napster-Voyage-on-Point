@@ -860,31 +860,63 @@ function toggleFlightDropdown(type) {
 function selectFlightAirport(type, code) {
     const apList = FLIGHT_AIRPORTS[type];
     const ap = apList.find(a => a.code === code);
-    if (!ap) return;
 
     if (type === 'origin') {
-        selectedFlightOrigin = code;
-        document.getElementById('selected-origin-display').innerHTML = `<span>🛫 ${ap.name}</span>`;
+        selectedFlightOrigin = code.toUpperCase();
+        const displayName = ap ? ap.name : code.toUpperCase();
+        document.getElementById('selected-origin-display').innerHTML = `<span>🛫 ${displayName}</span>`;
     } else {
-        selectedFlightDest = code;
-        document.getElementById('selected-dest-display').innerHTML = `<span>🛬 ${ap.name}</span>`;
+        selectedFlightDest = code.toUpperCase();
+        const displayName = ap ? ap.name : code.toUpperCase();
+        document.getElementById('selected-dest-display').innerHTML = `<span>🛬 ${displayName}</span>`;
     }
 
     document.getElementById(`flight-${type}-dropdown`).classList.remove('show');
 }
 
 function filterFlightDropdown(type) {
-    const query = document.getElementById(`flight-${type}-search`).value.toLowerCase();
+    const queryInput = document.getElementById(`flight-${type}-search`);
+    const query = queryInput.value.trim();
     const list = document.getElementById(`flight-${type}-list`);
-    const options = list.getElementsByTagName('button');
+    const options = list.getElementsByClassName('dropdown-option-item');
+
+    // Remove any existing "custom-option" button
+    const existingCustom = list.querySelector('.custom-option-item');
+    if (existingCustom) {
+        existingCustom.remove();
+    }
+
+    let matchCount = 0;
+    const cleanQuery = query.toLowerCase();
 
     for (let option of options) {
+        if (option.classList.contains('custom-option-item')) continue;
         const text = option.innerText.toLowerCase();
-        if (text.includes(query)) {
+        if (text.includes(cleanQuery)) {
             option.style.display = 'flex';
+            matchCount++;
         } else {
             option.style.display = 'none';
         }
+    }
+
+    // If query is not empty, show the "Use custom" option at the top
+    if (query.length > 0) {
+        const customBtn = document.createElement('button');
+        customBtn.className = 'dropdown-option-item custom-option-item';
+        customBtn.style.borderBottom = '1px dashed var(--border-light)';
+        customBtn.style.fontWeight = '700';
+        customBtn.style.color = 'var(--accent-emerald)';
+        
+        const displayCode = query.toUpperCase();
+        customBtn.onclick = () => {
+            selectFlightAirport(type, displayCode);
+            queryInput.value = ''; // clear search input
+        };
+        customBtn.innerHTML = `<span> must type custom: "${displayCode}"</span>`;
+        // Use a standard label
+        customBtn.innerHTML = `<span>➕ Use "${displayCode}"</span>`;
+        list.insertBefore(customBtn, list.firstChild);
     }
 }
 
