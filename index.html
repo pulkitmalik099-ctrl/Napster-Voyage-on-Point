@@ -70,133 +70,239 @@
     <!-- Calculator Section -->
     <section id="calculator-section" class="calculator-section">
         <div class="calculator-container">
-            <!-- Header -->
-            <div class="section-header">
-                <h2 class="section-title">Transfer Calculator</h2>
-                <p class="section-subtitle">Find the exact conversion values and bonus points across partner programs</p>
+            
+            <!-- Dashboard Tabs -->
+            <div class="dashboard-tabs">
+                <button id="tab-btn-flights" class="tab-toggle-btn active" onclick="switchDashboardTab('flights')">
+                    ✈️ Search Flights
+                </button>
+                <button id="tab-btn-calc" class="tab-toggle-btn" onclick="switchDashboardTab('calc')">
+                    🧮 Transfer Calculator
+                </button>
             </div>
 
-            <!-- Bonus Promos Bar -->
-            <div class="bonus-offers-bar">
-                <div class="bonus-dropdown-wrapper">
-                    <button id="bonus-dropdown-btn" class="bonus-trigger-btn" onclick="toggleBonusDropdown()">
-                        <span>⚡</span>
-                        <span id="bonus-count-badge">0 Bonus Offers</span>
-                        <svg class="bonus-trigger-chevron" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
-                        </svg>
+            <!-- Panel 1: Flight Search -->
+            <div id="panel-flights" class="dashboard-panel active">
+                <div class="section-header">
+                    <h2 class="section-title">Award Flight Finder</h2>
+                    <p class="section-subtitle">Search flights between global hubs, compare cash prices in INR with miles, and find your card transfer path</p>
+                </div>
+
+                <div class="calculator-inputs flight-inputs-grid">
+                    <!-- Origin -->
+                    <div class="input-group">
+                        <span class="input-label">Departure From</span>
+                        <div class="points-input-wrapper">
+                            <button id="flight-origin-btn" class="dropdown-trigger-btn" onclick="toggleFlightDropdown('origin')">
+                                <span id="selected-origin-display" class="selected-display">
+                                    <span>🛫 DEL - New Delhi</span>
+                                </span>
+                                <svg class="chevron-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                                </svg>
+                            </button>
+                        </div>
+                        <div id="flight-origin-dropdown" class="dropdown-options-box">
+                            <div class="dropdown-search-container">
+                                <input type="text" id="flight-origin-search" class="dropdown-search-input" placeholder="Search airports..." oninput="filterFlightDropdown('origin')">
+                            </div>
+                            <div id="flight-origin-list" class="dropdown-options-list">
+                                <!-- Populated dynamically -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Destination -->
+                    <div class="input-group">
+                        <span class="input-label">Flying To</span>
+                        <div class="points-input-wrapper">
+                            <button id="flight-dest-btn" class="dropdown-trigger-btn" onclick="toggleFlightDropdown('dest')">
+                                <span id="selected-dest-display" class="selected-display">
+                                    <span>🛬 LHR - London Heathrow</span>
+                                </span>
+                                <svg class="chevron-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                                </svg>
+                            </button>
+                        </div>
+                        <div id="flight-dest-dropdown" class="dropdown-options-box">
+                            <div class="dropdown-search-container">
+                                <input type="text" id="flight-dest-search" class="dropdown-search-input" placeholder="Search airports..." oninput="filterFlightDropdown('dest')">
+                            </div>
+                            <div id="flight-dest-list" class="dropdown-options-list">
+                                <!-- Populated dynamically -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Travel Date -->
+                    <div class="input-group">
+                        <span class="input-label">Travel Date</span>
+                        <div class="points-input-wrapper">
+                            <input type="date" id="flight-date-input" class="points-numeric-input" style="height: 3.5rem; font-family: inherit;">
+                        </div>
+                    </div>
+
+                    <!-- Cabin Class -->
+                    <div class="input-group">
+                        <span class="input-label">Cabin Class</span>
+                        <div class="points-input-wrapper">
+                            <select id="flight-class-select" class="sort-select" style="width: 100%; height: 3.5rem; border-radius: 0.75rem; border: 1px solid var(--border-light); padding: 0 1.25rem; background-color: var(--bg-card); font-family: inherit; font-size: 0.95rem; font-weight: 500; color: var(--text-primary);">
+                                <option value="ECONOMY">Economy Class</option>
+                                <option value="BUSINESS">Business Class</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="search-submit-container" style="display: flex; justify-content: center; margin-top: 2rem; margin-bottom: 2rem;">
+                    <button id="search-flights-btn" class="nav-btn primary-btn" style="height: 3.5rem; padding: 0 2.5rem; font-size: 1.05rem; display: flex; align-items: center; gap: 0.75rem;" onclick="executeFlightSearch()">
+                        <span>🔍</span> Search Award Flights
                     </button>
-                    <!-- Dropdown List -->
-                    <div id="bonus-dropdown-panel" class="bonus-panel">
-                        <div class="bonus-panel-header">
-                            <span>⚡ Active Bonus Offers</span>
-                            <p>Select to auto-fill</p>
-                        </div>
-                        <div id="bonus-offers-list" class="bonus-panel-content">
-                            <!-- Populated dynamically -->
-                        </div>
+                </div>
+
+                <!-- Flight Search Results Area -->
+                <div id="flight-search-results" class="flight-results-container" style="display: none;">
+                    <div id="flight-search-loading" class="flight-search-loading" style="display: none; text-align: center; padding: 4rem 0;">
+                        <div class="loading-airplane-spinner">✈️</div>
+                        <p style="margin-top: 1.5rem; color: var(--text-secondary); font-size: 0.95rem; font-weight: 500;">Searching seat inventory and live prices...</p>
+                    </div>
+                    <div id="flight-results-cards" class="flight-results-grid">
+                        <!-- Populated dynamically -->
                     </div>
                 </div>
             </div>
 
-            <!-- Input Form Controls -->
-            <div class="calculator-inputs">
-                <!-- Dropdown From -->
-                <div class="input-group">
-                    <span class="input-label">Transfer From</span>
-                    <div class="points-input-wrapper" style="display: flex; gap: 0.5rem;">
-                        <button id="from-program-btn" class="dropdown-trigger-btn" onclick="toggleDropdown('from')">
-                            <span id="selected-from-display" class="selected-display">
-                                <span class="selected-placeholder">📋 Select card or program...</span>
-                            </span>
-                            <svg class="chevron-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <!-- Panel 2: Transfer Calculator -->
+            <div id="panel-calc" class="dashboard-panel">
+                <!-- Header -->
+                <div class="section-header">
+                    <h2 class="section-title">Transfer Calculator</h2>
+                    <p class="section-subtitle">Find the exact conversion values and bonus points across partner programs</p>
+                </div>
+
+                <!-- Bonus Promos Bar -->
+                <div class="bonus-offers-bar">
+                    <div class="bonus-dropdown-wrapper">
+                        <button id="bonus-dropdown-btn" class="bonus-trigger-btn" onclick="toggleBonusDropdown()">
+                            <span>⚡</span>
+                            <span id="bonus-count-badge">0 Bonus Offers</span>
+                            <svg class="bonus-trigger-chevron" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
                             </svg>
                         </button>
-                        <button id="clear-from-btn" class="clear-selection-btn" onclick="clearFromSelection()" style="display: none;" title="Clear program selection">
-                            <svg style="width: 1.25rem; height: 1.25rem;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-                            </svg>
-                        </button>
-                    </div>
-                    <!-- Custom Dropdown container -->
-                    <div id="from-program-dropdown" class="dropdown-options-box">
-                        <div class="dropdown-search-container">
-                            <input type="text" id="from-search-input" class="dropdown-search-input" placeholder="Search credit cards, banks..." oninput="filterDropdown('from')">
-                        </div>
-                        <div id="from-options-list" class="dropdown-options-list">
-                            <!-- Populated dynamically -->
+                        <!-- Dropdown List -->
+                        <div id="bonus-dropdown-panel" class="bonus-panel">
+                            <div class="bonus-panel-header">
+                                <span>⚡ Active Bonus Offers</span>
+                                <p>Select to auto-fill</p>
+                            </div>
+                            <div id="bonus-offers-list" class="bonus-panel-content">
+                                <!-- Populated dynamically -->
+                            </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Dropdown To -->
-                <div class="input-group">
-                    <span class="input-label">Transfer To</span>
-                    <div class="points-input-wrapper" style="display: flex; gap: 0.5rem;">
-                        <button id="to-program-btn" class="dropdown-trigger-btn" onclick="toggleDropdown('to')">
-                            <span id="selected-to-display" class="selected-display">
-                                <span class="selected-placeholder">✈️ Select airline or hotel...</span>
-                            </span>
-                            <svg class="chevron-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
-                            </svg>
-                        </button>
-                        <button id="clear-to-btn" class="clear-selection-btn" onclick="clearToSelection()" style="display: none;" title="Clear destination selection">
-                            <svg style="width: 1.25rem; height: 1.25rem;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-                            </svg>
-                        </button>
-                    </div>
-                    <!-- Custom Dropdown container -->
-                    <div id="to-program-dropdown" class="dropdown-options-box">
-                        <div class="dropdown-search-container">
-                            <input type="text" id="to-search-input" class="dropdown-search-input" placeholder="Search airlines, hotels..." oninput="filterDropdown('to')">
+                <!-- Input Form Controls -->
+                <div class="calculator-inputs">
+                    <!-- Dropdown From -->
+                    <div class="input-group">
+                        <span class="input-label">Transfer From</span>
+                        <div class="points-input-wrapper" style="display: flex; gap: 0.5rem;">
+                            <button id="from-program-btn" class="dropdown-trigger-btn" onclick="toggleDropdown('from')">
+                                <span id="selected-from-display" class="selected-display">
+                                    <span class="selected-placeholder">📋 Select card or program...</span>
+                                </span>
+                                <svg class="chevron-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                                </svg>
+                            </button>
+                            <button id="clear-from-btn" class="clear-selection-btn" onclick="clearFromSelection()" style="display: none;" title="Clear program selection">
+                                <svg style="width: 1.25rem; height: 1.25rem;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                                </svg>
+                            </button>
                         </div>
-                        <div id="to-options-list" class="dropdown-options-list">
-                            <!-- Populated dynamically -->
+                        <!-- Custom Dropdown container -->
+                        <div id="from-program-dropdown" class="dropdown-options-box">
+                            <div class="dropdown-search-container">
+                                <input type="text" id="from-search-input" class="dropdown-search-input" placeholder="Search credit cards, banks..." oninput="filterDropdown('from')">
+                            </div>
+                            <div id="from-options-list" class="dropdown-options-list">
+                                <!-- Populated dynamically -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Dropdown To -->
+                    <div class="input-group">
+                        <span class="input-label">Transfer To</span>
+                        <div class="points-input-wrapper" style="display: flex; gap: 0.5rem;">
+                            <button id="to-program-btn" class="dropdown-trigger-btn" onclick="toggleDropdown('to')">
+                                <span id="selected-to-display" class="selected-display">
+                                    <span class="selected-placeholder">✈️ Select airline or hotel...</span>
+                                </span>
+                                <svg class="chevron-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                                </svg>
+                            </button>
+                            <button id="clear-to-btn" class="clear-selection-btn" onclick="clearToSelection()" style="display: none;" title="Clear destination selection">
+                                <svg style="width: 1.25rem; height: 1.25rem;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                                </svg>
+                            </button>
+                        </div>
+                        <!-- Custom Dropdown container -->
+                        <div id="to-program-dropdown" class="dropdown-options-box">
+                            <div class="dropdown-search-container">
+                                <input type="text" id="to-search-input" class="dropdown-search-input" placeholder="Search airlines, hotels..." oninput="filterDropdown('to')">
+                            </div>
+                            <div id="to-options-list" class="dropdown-options-list">
+                                <!-- Populated dynamically -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Numeric Points Input -->
+                    <div class="input-group">
+                        <span class="input-label">Points to Transfer</span>
+                        <div class="points-input-wrapper">
+                            <input type="number" id="points-input-val" class="points-numeric-input" value="10000" min="100" step="100" oninput="updatePointsVal(this.value)">
+                        </div>
+                        <input type="range" id="points-slider" class="slider-control" min="1000" max="100000" step="1000" value="10000" oninput="updatePointsVal(this.value)">
+                        <div class="presets-container">
+                            <button class="preset-pill-btn" onclick="adjustPoints(5000)">+5K</button>
+                            <button class="preset-pill-btn" onclick="adjustPoints(10000)">+10K</button>
+                            <button class="preset-pill-btn" onclick="adjustPoints(50000)">+50K</button>
+                            <button class="preset-pill-btn" onclick="setPoints(100000)">100K</button>
                         </div>
                     </div>
                 </div>
 
-                <!-- Numeric Points Input -->
-                <div class="input-group">
-                    <span class="input-label">Points to Transfer</span>
-                    <div class="points-input-wrapper">
-                        <input type="number" id="points-input-val" class="points-numeric-input" value="10000" min="100" step="100" oninput="updatePointsVal(this.value)">
-                    </div>
-                    <input type="range" id="points-slider" class="slider-control" min="1000" max="100000" step="1000" value="10000" oninput="updatePointsVal(this.value)">
-                    <div class="presets-container">
-                        <button class="preset-pill-btn" onclick="adjustPoints(5000)">+5K</button>
-                        <button class="preset-pill-btn" onclick="adjustPoints(10000)">+10K</button>
-                        <button class="preset-pill-btn" onclick="adjustPoints(50000)">+50K</button>
-                        <button class="preset-pill-btn" onclick="setPoints(100000)">100K</button>
+                <!-- Sorting & Filters Bar -->
+                <div class="results-header-controls">
+                    <span class="results-count" id="results-count-label">Showing results</span>
+                    <div class="results-filters">
+                        <!-- Categories -->
+                        <div class="filter-group">
+                            <button id="filter-all-btn" class="filter-tab-btn active" onclick="setCategoryFilter('ALL')">All</button>
+                            <button id="filter-airline-btn" class="filter-tab-btn" onclick="setCategoryFilter('AIRLINE')">Airlines</button>
+                            <button id="filter-hotel-btn" class="filter-tab-btn" onclick="setCategoryFilter('HOTEL')">Hotels</button>
+                        </div>
+                        <!-- Sorting -->
+                        <select id="results-sort" class="sort-select" onchange="setSortOrder(this.value)">
+                            <option value="VALUE_DESC">Highest Value (Optimal)</option>
+                            <option value="RATIO_ASC">Best Transfer Ratio</option>
+                            <option value="NAME_ASC">Name (A-Z)</option>
+                        </select>
                     </div>
                 </div>
-            </div>
 
-            <!-- Sorting & Filters Bar -->
-            <div class="results-header-controls">
-                <span class="results-count" id="results-count-label">Showing results</span>
-                <div class="results-filters">
-                    <!-- Categories -->
-                    <div class="filter-group">
-                        <button id="filter-all-btn" class="filter-tab-btn active" onclick="setCategoryFilter('ALL')">All</button>
-                        <button id="filter-airline-btn" class="filter-tab-btn" onclick="setCategoryFilter('AIRLINE')">Airlines</button>
-                        <button id="filter-hotel-btn" class="filter-tab-btn" onclick="setCategoryFilter('HOTEL')">Hotels</button>
-                    </div>
-                    <!-- Sorting -->
-                    <select id="results-sort" class="sort-select" onchange="setSortOrder(this.value)">
-                        <option value="VALUE_DESC">Highest Value (Optimal)</option>
-                        <option value="RATIO_ASC">Best Transfer Ratio</option>
-                        <option value="NAME_ASC">Name (A-Z)</option>
-                    </select>
+                <!-- Results Grid -->
+                <div id="results-grid" class="results-grid">
+                    <!-- Populated dynamically by app.js -->
                 </div>
-            </div>
-
-            <!-- Results Grid -->
-            <div id="results-grid" class="results-grid">
-                <!-- Populated dynamically by app.js -->
             </div>
         </div>
     </section>
