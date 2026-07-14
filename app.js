@@ -51,6 +51,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Populate dropdowns initially
     populateDropdownLists();
+    populateFlightAirports();
+
+    // Set default flight date to 7 days from today
+    const dateInput = document.getElementById('flight-date-input');
+    if (dateInput) {
+        dateInput.valueAsDate = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
+    }
 
     // Attach scroll listener for sticky summary bar
     
