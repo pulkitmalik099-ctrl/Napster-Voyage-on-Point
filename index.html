@@ -88,6 +88,24 @@
                     <p class="section-subtitle">Search flights between global hubs, compare cash prices in INR with miles, and find your card transfer path</p>
                 </div>
 
+                <!-- Trip Type + Passengers Row -->
+                <div class="flight-meta-row">
+                    <!-- One-Way / Round-Trip Toggle -->
+                    <div class="trip-type-toggle">
+                        <button id="trip-oneway-btn" class="trip-type-btn active" onclick="setTripType('ONEWAY')">One-Way</button>
+                        <button id="trip-roundtrip-btn" class="trip-type-btn" onclick="setTripType('ROUNDTRIP')">Round-Trip</button>
+                    </div>
+                    <!-- Passenger Stepper -->
+                    <div class="passenger-stepper">
+                        <span class="input-label" style="margin-bottom:0;">Passengers</span>
+                        <div class="stepper-controls">
+                            <button class="stepper-btn" id="pax-minus" onclick="adjustPassengers(-1)">&#8722;</button>
+                            <span id="pax-count" class="stepper-value">1</span>
+                            <button class="stepper-btn" id="pax-plus" onclick="adjustPassengers(1)">&#43;</button>
+                        </div>
+                    </div>
+                </div>
+
                 <div class="calculator-inputs flight-inputs-grid">
                     <!-- Origin -->
                     <div class="input-group">
@@ -167,6 +185,26 @@
                         <div class="loading-airplane-spinner">✈️</div>
                         <p style="margin-top: 1.5rem; color: var(--text-secondary); font-size: 0.95rem; font-weight: 500;">Searching seat inventory and live prices...</p>
                     </div>
+
+                    <!-- Sort + Filter Bar (shown after results load) -->
+                    <div id="flight-sort-filter-bar" class="flight-sort-filter-bar" style="display:none;">
+                        <!-- Smart Sort Tabs -->
+                        <div class="flight-sort-tabs">
+                            <button class="flight-sort-tab active" id="sort-tab-points" onclick="setFlightSort('POINTS')">🏷️ Cheapest (Points)</button>
+                            <button class="flight-sort-tab" id="sort-tab-cash" onclick="setFlightSort('CASH')">💰 Cheapest (Cash)</button>
+                            <button class="flight-sort-tab" id="sort-tab-fastest" onclick="setFlightSort('FASTEST')">⚡ Fastest</button>
+                            <button class="flight-sort-tab" id="sort-tab-yield" onclick="setFlightSort('YIELD')">📈 Best (Yield)</button>
+                        </div>
+                        <!-- Stops Filter -->
+                        <div class="flight-stops-filter">
+                            <button class="stops-pill active" id="stops-all-btn" onclick="setStopsFilter('ALL')">All</button>
+                            <button class="stops-pill" id="stops-direct-btn" onclick="setStopsFilter('DIRECT')">Direct Only</button>
+                        </div>
+                    </div>
+
+                    <!-- Airline filter checklist (populated dynamically) -->
+                    <div id="flight-airline-filter-bar" class="flight-airline-filter-bar" style="display:none;"></div>
+
                     <div id="flight-results-cards" class="flight-results-grid">
                         <!-- Populated dynamically -->
                     </div>

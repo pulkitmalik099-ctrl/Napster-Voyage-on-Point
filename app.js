@@ -756,6 +756,12 @@ function closeDetailModal(event) {
 
 let selectedFlightOrigin = 'DEL';
 let selectedFlightDest = 'LHR';
+let selectedTripType = 'ONEWAY';
+let selectedPassengers = 1;
+let flightSortMode = 'POINTS';
+let flightStopsFilter = 'ALL';
+let flightSelectedAirlines = new Set();
+let currentRawFlights = [];
 
 const FLIGHT_AIRPORTS = {
     origin: [
@@ -1003,122 +1009,347 @@ function findBestCardTransfers(partnerId, requiredMiles) {
     return options.sort((a, b) => a.pointsNeeded - b.pointsNeeded);
 }
 
-function executeFlightSearch() {
+function setTripType(type) {
+    selectedTripType = type;
+    document.getElementById('trip-oneway-btn').classList.toggle('active', type === 'ONEWAY');
+    document.getElementById('trip-roundtrip-btn').classList.toggle('active', type === 'ROUNDTRIP');
+}
+
+function adjustPassengers(amount) {
+    const nextVal = selectedPassengers + amount;
+    if (nextVal >= 1 && nextVal <= 9) {
+        selectedPassengers = nextVal;
+        document.getElementById('pax-count').innerText = selectedPassengers;
+    }
+}
+
+function setFlightSort(mode) {
+    flightSortMode = mode;
+    document.getElementById('sort-tab-points').classList.toggle('active', mode === 'POINTS');
+    document.getElementById('sort-tab-cash').classList.toggle('active', mode === 'CASH');
+    document.getElementById('sort-tab-fastest').classList.toggle('active', mode === 'FASTEST');
+    document.getElementById('sort-tab-yield').classList.toggle('active', mode === 'YIELD');
+    renderFlightResults();
+}
+
+function setStopsFilter(stops) {
+    flightStopsFilter = stops;
+    document.getElementById('stops-all-btn').classList.toggle('active', stops === 'ALL');
+    document.getElementById('stops-direct-btn').classList.toggle('active', stops === 'DIRECT');
+    renderFlightResults();
+}
+
+function toggleAirlineFilter(cb) {
+    const airline = cb.value;
+    if (cb.checked) {
+        flightSelectedAirlines.add(airline);
+    } else {
+        flightSelectedAirlines.delete(airline);
+    }
+    renderFlightResults();
+}
+
+const CARRIER_MAP = {
+    'QR': { name: 'Qatar Airways', partnerId: 48, logo: 'logos/qatar_privilege_club.webp' },
+    'SQ': { name: 'Singapore Airlines', partnerId: 82, logo: 'logos/krisflyer.webp' },
+    'AI': { name: 'Air India', partnerId: 85, logo: 'logos/maharaja_club.webp' },
+    'BA': { name: 'British Airways', partnerId: 47, logo: 'logos/british_airways_executive_club.webp' },
+    'VS': { name: 'Virgin Atlantic', partnerId: 94, logo: 'logos/virgin_atlantic_flying_club.webp' },
+    'EK': { name: 'Emirates', partnerId: 74, logo: 'logos/emirates_skywards.webp' }
+};
+
+function parseDuration(iso) {
+    if (!iso) return '12h 45m';
+    const match = iso.match(/PT(?:(\d+)H)?(?:(\d+)M)?/);
+    if (!match) return '12h 45m';
+    const h = match[1] ? match[1] + 'h' : '';
+    const m = match[2] ? match[2] + 'm' : '';
+    return `${h} ${m}`.trim() || 'Direct';
+}
+
+function generateOfflineSimulatedFlights(origin, dest, cabinClass) {
+    const carriers = [
+        { name: 'Qatar Airways', partnerId: 48, logo: 'logos/qatar_privilege_club.webp', stops: '1 Stop', duration: '12h 45m', code: 'QR' },
+        { name: 'Singapore Airlines', partnerId: 82, logo: 'logos/krisflyer.webp', stops: 'Direct', duration: '5h 45m', code: 'SQ' },
+        { name: 'Air India', partnerId: 85, logo: 'logos/maharaja_club.webp', stops: 'Direct', duration: '9h 15m', code: 'AI' }
+    ];
+    
+    const isBiz = cabinClass === 'BUSINESS';
+    const baseMiles = isBiz ? 70000 : 25000;
+    const baseCash = isBiz ? 120000 : 38000;
+    const baseTaxes = isBiz ? 15000 : 6000;
+    
+    const paxMultiplier = selectedPassengers;
+    const tripMultiplier = selectedTripType === 'ROUNDTRIP' ? 2 : 1;
+    const cashMultiplier = selectedTripType === 'ROUNDTRIP' ? 1.85 : 1;
+    
+    return carriers.map((c, i) => {
+        const factor = 1.0 + (i * 0.15) - 0.1;
+        const milesVal = Math.round(baseMiles * factor * paxMultiplier * tripMultiplier / 500) * 500;
+        const cashVal = Math.round(baseCash * factor * paxMultiplier * cashMultiplier / 1000) * 1000;
+        const taxVal = Math.round(baseTaxes * factor * paxMultiplier * tripMultiplier / 100) * 100;
+        return {
+            airline: c.name,
+            carrierCode: c.code,
+            number: `${c.code} ${500 + i * 23}`,
+            duration: c.duration,
+            stops: c.stops,
+            miles: milesVal,
+            taxes: taxVal,
+            cash: cashVal,
+            partnerId: c.partnerId,
+            logo: c.logo
+        };
+    });
+}
+
+function buildAirlineFilter(flights) {
+    const filterBar = document.getElementById('flight-airline-filter-bar');
+    if (!filterBar) return;
+
+    const airlines = Array.from(new Set(flights.map(f => f.airline)));
+    
+    if (airlines.length <= 1) {
+        filterBar.style.display = 'none';
+        return;
+    }
+
+    filterBar.innerHTML = `<span style="font-size: 0.8rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin-right: 1rem;">Filter Airlines:</span>`;
+    
+    airlines.forEach(airline => {
+        const label = document.createElement('label');
+        label.className = 'airline-checkbox-label';
+        label.innerHTML = `
+            <input type="checkbox" value="${airline}" onchange="toggleAirlineFilter(this)">
+            <span>${airline}</span>
+        `;
+        filterBar.appendChild(label);
+    });
+    
+    filterBar.style.display = 'flex';
+}
+
+async function executeFlightSearch() {
     const resultsContainer = document.getElementById('flight-search-results');
     const loadingEl = document.getElementById('flight-search-loading');
     const cardsEl = document.getElementById('flight-results-cards');
+    const sortFilterBar = document.getElementById('flight-sort-filter-bar');
+    const airlineFilterBar = document.getElementById('flight-airline-filter-bar');
     
     if (!resultsContainer || !loadingEl || !cardsEl) return;
     
     resultsContainer.style.display = 'block';
     loadingEl.style.display = 'block';
     cardsEl.style.display = 'none';
+    if (sortFilterBar) sortFilterBar.style.display = 'none';
+    if (airlineFilterBar) airlineFilterBar.style.display = 'none';
     cardsEl.innerHTML = '';
     
+    const cabinClass = document.getElementById('flight-class-select').value;
+    let flights = [];
+
+    try {
+        const dateInput = document.getElementById('flight-date-input').value || new Date().toISOString().split('T')[0];
+        let url = `http://localhost:3001/api/flights?origin=${selectedFlightOrigin}&dest=${selectedFlightDest}&date=${dateInput}&adults=${selectedPassengers}&cabinClass=${cabinClass}`;
+        if (selectedTripType === 'ROUNDTRIP') {
+            const d = new Date(dateInput);
+            d.setDate(d.getDate() + 7);
+            const returnDateStr = d.toISOString().split('T')[0];
+            url += `&returnDate=${returnDateStr}`;
+        }
+
+        const res = await fetch(url);
+        if (!res.ok) throw new Error("API call failed");
+        const body = await res.json();
+        
+        if (body.simulated) {
+            flights = body.data;
+        } else {
+            flights = (body.data || []).map((f, idx) => {
+                const valCode = f.validatingAirlineCodes ? f.validatingAirlineCodes[0] : 'AI';
+                const carrier = CARRIER_MAP[valCode] || { name: valCode, partnerId: null, logo: 'logos/li.png' };
+                const segments = f.itineraries[0].segments;
+                const segmentsCount = segments ? segments.length : 1;
+                const stopsText = segmentsCount === 1 ? 'Direct' : `${segmentsCount - 1} Stop${segmentsCount - 1 > 1 ? 's' : ''}`;
+                const durationText = parseDuration(f.itineraries[0].duration);
+                
+                const cashVal = Math.round(parseFloat(f.price.grandTotal));
+                const basePrice = parseFloat(f.price.base || f.price.total);
+                const taxVal = Math.round(cashVal - basePrice) || 5400;
+                
+                const isBiz = cabinClass === 'BUSINESS';
+                const baseMiles = isBiz ? 70000 : 25000;
+                const tripMultiplier = selectedTripType === 'ROUNDTRIP' ? 2 : 1;
+                const milesVal = Math.round(baseMiles * selectedPassengers * tripMultiplier);
+
+                return {
+                    airline: carrier.name,
+                    carrierCode: valCode,
+                    number: `${valCode} ${500 + idx * 23}`,
+                    duration: durationText,
+                    stops: stopsText,
+                    miles: milesVal,
+                    taxes: taxVal,
+                    cash: cashVal,
+                    partnerId: carrier.partnerId,
+                    logo: carrier.logo
+                };
+            });
+        }
+    } catch (err) {
+        console.log("Amadeus API not reachable. Using offline simulated flights.");
+        flights = generateOfflineSimulatedFlights(selectedFlightOrigin, selectedFlightDest, cabinClass);
+    }
+
     setTimeout(() => {
         loadingEl.style.display = 'none';
         cardsEl.style.display = 'grid';
         
-        const cabinClass = document.getElementById('flight-class-select').value;
-        const flights = generateMockFlights(selectedFlightOrigin, selectedFlightDest, cabinClass);
+        currentRawFlights = flights;
+        flightSelectedAirlines.clear();
         
         if (flights.length === 0) {
             cardsEl.innerHTML = '<p style="text-align: center; grid-column: 1/-1; padding: 2rem; color: var(--text-secondary);">No flights found for this route.</p>';
             return;
         }
         
-        flights.forEach(f => {
-            const cashYield = (f.cash - f.taxes) / f.miles;
-            const yieldText = cashYield.toFixed(2);
-            const transfers = findBestCardTransfers(f.partnerId, f.miles);
-            
-            let transferSectionHtml = '';
-            let actionHtml = '';
-            
-            if (transfers.length > 0) {
-                const best = transfers[0];
-                transferSectionHtml = `
-                    <div class="flight-transfer-instruction">
-                        💡 Transfer <strong>${best.pointsNeeded.toLocaleString()}</strong> ${best.cardName} points (${best.ratioText} ratio) to ${f.airline}
-                    </div>
-                `;
-                actionHtml = `
-                    <button class="flight-action-btn" onclick="viewTransferPath(${best.cardId}, ${f.partnerId}, ${best.pointsNeeded})">
-                        🔗 View Transfer Path
-                    </button>
-                `;
-            } else {
-                transferSectionHtml = `
-                    <div class="flight-transfer-instruction" style="border-left-color: var(--text-muted);">
-                        ℹ️ No credit card points transfer pathway found in our loyalty database. Use cash or direct miles.
-                    </div>
-                `;
-                actionHtml = `
-                    <button class="flight-action-btn" disabled style="opacity: 0.5; cursor: not-allowed;">
-                        No Path Available
-                    </button>
-                `;
-            }
-            
-            const card = document.createElement('div');
-            card.className = 'flight-card';
-            card.innerHTML = `
-                <div class="flight-yield-badge">Value: ₹${yieldText} / mile</div>
-                
-                <div class="flight-card-header">
-                    <div class="flight-airline-info">
-                        <img class="flight-airline-logo" src="${getLogoUrl(f.logo)}" alt="${f.airline}">
-                        <div style="display: flex; flex-direction: column;">
-                            <span class="flight-airline-name">${f.airline}</span>
-                            <span class="flight-number">${f.number}</span>
-                        </div>
-                    </div>
-                    <span class="flight-cabin-badge ${cabinClass === 'BUSINESS' ? 'business' : ''}">${cabinClass}</span>
-                </div>
-                
-                <div class="flight-card-body">
-                    <div class="flight-route-time-block">
-                        <div class="flight-time">08:15</div>
-                        <div class="flight-airport">${selectedFlightOrigin}</div>
-                    </div>
-                    
-                    <div class="flight-duration-block">
-                        <span class="flight-duration">${f.duration}</span>
-                        <div class="flight-line-indicator"></div>
-                        <span class="flight-stops">${f.stops}</span>
-                    </div>
-                    
-                    <div class="flight-route-time-block" style="text-align: right;">
-                        <div class="flight-time">17:45</div>
-                        <div class="flight-airport">${selectedFlightDest}</div>
-                    </div>
-                </div>
-                
-                <div class="flight-pricing-compare">
-                    <div class="pricing-box cash-price">
-                        <span class="pricing-box-label">Cash Price</span>
-                        <span class="pricing-box-value">₹${f.cash.toLocaleString()}</span>
-                        <span class="pricing-box-subtext">All-inclusive cash ticket</span>
-                    </div>
-                    <div class="pricing-box points-price">
-                        <span class="pricing-box-label">Points Price</span>
-                        <span class="pricing-box-value">${f.miles.toLocaleString()} miles</span>
-                        <span class="pricing-box-subtext">+ ₹${f.taxes.toLocaleString()} taxes</span>
-                    </div>
-                </div>
-                
-                <div class="flight-card-footer">
-                    ${transferSectionHtml}
-                    ${actionHtml}
+        buildAirlineFilter(flights);
+        if (sortFilterBar) sortFilterBar.style.display = 'flex';
+        renderFlightResults();
+    }, 1000);
+}
+
+function renderFlightResults() {
+    const cardsEl = document.getElementById('flight-results-cards');
+    if (!cardsEl) return;
+    cardsEl.innerHTML = '';
+
+    let filtered = currentRawFlights.filter(f => {
+        if (flightStopsFilter === 'DIRECT') {
+            return f.stops === 'Direct';
+        }
+        return true;
+    });
+
+    if (flightSelectedAirlines.size > 0) {
+        filtered = filtered.filter(f => flightSelectedAirlines.has(f.airline));
+    }
+
+    if (flightSortMode === 'POINTS') {
+        filtered.sort((a, b) => a.miles - b.miles);
+    } else if (flightSortMode === 'CASH') {
+        filtered.sort((a, b) => a.cash - b.cash);
+    } else if (flightSortMode === 'FASTEST') {
+        const getMinutes = (dur) => {
+            const match = dur.match(/(?:(\d+)h)?\s*(?:(\d+)m)?/);
+            const h = match && match[1] ? parseInt(match[1]) * 60 : 0;
+            const m = match && match[2] ? parseInt(match[2]) : 0;
+            return h + m || 9999;
+        };
+        filtered.sort((a, b) => getMinutes(a.duration) - getMinutes(b.duration));
+    } else if (flightSortMode === 'YIELD') {
+        const getYield = (f) => (f.cash - f.taxes) / f.miles;
+        filtered.sort((a, b) => getYield(b) - getYield(a));
+    }
+
+    if (filtered.length === 0) {
+        cardsEl.innerHTML = '<p style="text-align: center; grid-column: 1/-1; padding: 2rem; color: var(--text-secondary);">No flights match your filters.</p>';
+        return;
+    }
+
+    const cabinClass = document.getElementById('flight-class-select').value;
+
+    filtered.forEach(f => {
+        const cashYield = (f.cash - f.taxes) / f.miles;
+        const yieldText = cashYield.toFixed(2);
+        const transfers = findBestCardTransfers(f.partnerId, f.miles);
+        
+        let transferSectionHtml = '';
+        let actionHtml = '';
+        
+        if (transfers.length > 0) {
+            const best = transfers[0];
+            transferSectionHtml = `
+                <div class="flight-transfer-instruction">
+                    💡 Transfer <strong>${best.pointsNeeded.toLocaleString()}</strong> ${best.cardName} points (${best.ratioText} ratio) to ${f.airline}
                 </div>
             `;
-            cardsEl.appendChild(card);
-        });
-        
-        if (window.twemoji) {
-            window.twemoji.parse(cardsEl);
+            actionHtml = `
+                <button class="flight-action-btn" onclick="viewTransferPath(${best.cardId}, ${f.partnerId}, ${best.pointsNeeded})">
+                    🔗 View Transfer Path
+                </button>
+            `;
+        } else {
+            transferSectionHtml = `
+                <div class="flight-transfer-instruction" style="border-left-color: var(--text-muted);">
+                    ℹ️ No credit card points transfer pathway found in our loyalty database. Use cash or direct miles.
+                </div>
+            `;
+            actionHtml = `
+                <button class="flight-action-btn" disabled style="opacity: 0.5; cursor: not-allowed;">
+                    No Path Available
+                </button>
+            `;
         }
-    }, 1200);
+        
+        const card = document.createElement('div');
+        card.className = 'flight-card';
+        card.innerHTML = `
+            <div class="flight-yield-badge">Value: ₹${yieldText} / mile</div>
+            
+            <div class="flight-card-header">
+                <div class="flight-airline-info">
+                    <img class="flight-airline-logo" src="${getLogoUrl(f.logo)}" alt="${f.airline}" onerror="this.src='logos/li.png'">
+                    <div style="display: flex; flex-direction: column;">
+                        <span class="flight-airline-name">${f.airline}</span>
+                        <span class="flight-number">${f.number}</span>
+                    </div>
+                </div>
+                <span class="flight-cabin-badge ${cabinClass === 'BUSINESS' ? 'business' : ''}">${cabinClass}</span>
+            </div>
+            
+            <div class="flight-card-body">
+                <div class="flight-route-time-block">
+                    <div class="flight-time">08:15</div>
+                    <div class="flight-airport">${selectedFlightOrigin}</div>
+                </div>
+                
+                <div class="flight-duration-block">
+                    <span class="flight-duration">${f.duration}</span>
+                    <div class="flight-line-indicator"></div>
+                    <span class="flight-stops">${f.stops}</span>
+                </div>
+                
+                <div class="flight-route-time-block" style="text-align: right;">
+                    <div class="flight-time">17:45</div>
+                    <div class="flight-airport">${selectedFlightDest}</div>
+                </div>
+            </div>
+            
+            <div class="flight-pricing-compare">
+                <div class="pricing-box cash-price">
+                    <span class="pricing-box-label">Cash Price</span>
+                    <span class="pricing-box-value">₹${f.cash.toLocaleString()}</span>
+                    <span class="pricing-box-subtext">All-inclusive cash ticket</span>
+                </div>
+                <div class="pricing-box points-price">
+                    <span class="pricing-box-label">Points Price</span>
+                    <span class="pricing-box-value">${f.miles.toLocaleString()} miles</span>
+                    <span class="pricing-box-subtext">+ ₹${f.taxes.toLocaleString()} taxes</span>
+                </div>
+            </div>
+            
+            <div class="flight-card-footer">
+                ${transferSectionHtml}
+                ${actionHtml}
+            </div>
+        `;
+        cardsEl.appendChild(card);
+    });
+
+    if (window.twemoji) {
+        window.twemoji.parse(cardsEl);
+    }
 }
 
 function viewTransferPath(cardId, partnerId, pointsNeeded) {
@@ -1134,4 +1365,9 @@ window.toggleFlightDropdown = toggleFlightDropdown;
 window.filterFlightDropdown = filterFlightDropdown;
 window.executeFlightSearch = executeFlightSearch;
 window.viewTransferPath = viewTransferPath;
+window.setTripType = setTripType;
+window.adjustPassengers = adjustPassengers;
+window.setFlightSort = setFlightSort;
+window.setStopsFilter = setStopsFilter;
+window.toggleAirlineFilter = toggleAirlineFilter;
 
