@@ -275,9 +275,18 @@
                             <button class="preset-pill-btn" onclick="adjustPoints(5000)">+5K</button>
                             <button class="preset-pill-btn" onclick="adjustPoints(10000)">+10K</button>
                             <button class="preset-pill-btn" onclick="adjustPoints(50000)">+50K</button>
-                            <button class="preset-pill-btn" onclick="setPoints(100000)">100K</button>
-                        </div>
                     </div>
+                </div>
+
+                <!-- Instant Result Summary Box (shown when both are selected) -->
+                <div id="instant-result-container" class="instant-result-container" style="display: none; margin-top: 1.5rem; padding: 1.5rem; border-radius: var(--radius-xl); background: linear-gradient(135deg, rgba(16, 185, 129, 0.07) 0%, rgba(5, 150, 105, 0.02) 100%); border: 1px solid rgba(16, 185, 129, 0.15); text-align: center; margin-bottom: 2rem; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);">
+                    <div style="font-size: 0.8rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 0.75rem;">Calculated Conversion Path</div>
+                    <div style="display: flex; align-items: center; justify-content: center; gap: 1rem; flex-wrap: wrap;">
+                        <span style="font-size: 1.15rem; font-weight: 700; color: var(--text-primary);" id="instant-result-from">10,000 points</span>
+                        <span style="font-size: 1.5rem; color: var(--accent-emerald); font-weight: 700;">➔</span>
+                        <span style="font-size: 1.4rem; font-weight: 800; color: var(--accent-emerald);" id="instant-result-to">10,000 miles</span>
+                    </div>
+                    <div style="font-size: 0.9rem; color: var(--text-secondary); margin-top: 0.75rem; font-weight: 500;" id="instant-result-worth">Equivalent to ₹6,300 in travel value</div>
                 </div>
 
                 <!-- Sorting & Filters Bar -->

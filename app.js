@@ -524,6 +524,20 @@ function refreshCalculator() {
         item.yieldPercentage = sourceCostInr > 0 ? (item.valueInr / sourceCostInr) * 100 : 100;
     });
 
+    // Update Instant Result Container
+    const instantResultContainer = document.getElementById('instant-result-container');
+    if (instantResultContainer) {
+        if (selectedFromId && selectedToId && matches.length > 0) {
+            const item = matches[0];
+            document.getElementById('instant-result-from').innerText = `${transferValue.toLocaleString()} ${item.sourceName} points`;
+            document.getElementById('instant-result-to').innerText = `${item.outputPoints.toLocaleString()} ${item.partnerName} points/miles`;
+            document.getElementById('instant-result-worth').innerText = `Equivalent to ₹${Math.round(item.valueInr).toLocaleString()} in travel value (Yield: ₹${(item.partnerVal || 1.0).toFixed(2)} / mile)`;
+            instantResultContainer.style.display = 'block';
+        } else {
+            instantResultContainer.style.display = 'none';
+        }
+    }
+
     // Apply Sorting
     if (sortOrder === 'VALUE_DESC') {
         matches.sort((a, b) => b.valueInr - a.valueInr);
